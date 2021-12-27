@@ -11,8 +11,10 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	log.Println("Message Server Start...")
-	http.HandlerFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-
+	hub := newHub()
+	go hub.run()
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(hub, w, r)
 	})
 	err := http.ListenAndServe(":4321", nil)
 	if err != nil {
