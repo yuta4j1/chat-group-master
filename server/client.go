@@ -24,6 +24,7 @@ var (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin:     func(*http.Request) bool { return true },
 }
 
 type Client struct {
@@ -52,6 +53,7 @@ func (c *Client) readPump() {
 		}
 
 		message = bytes.TrimSpace(bytes.Replace(message, newLine, space, -1))
+		log.Println("message:", string(message))
 		c.hub.broadcast <- message
 	}
 }
