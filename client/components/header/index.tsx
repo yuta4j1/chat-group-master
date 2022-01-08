@@ -8,7 +8,7 @@ const Header: React.VFC<{ roomName: string }> = ({ roomName }) => {
       <div className={styles.sideNav}>
         <div>Channels</div>
         <button className={styles.channelAddButton}>
-          <BsPlus size={21}/>
+          <BsPlus size={21} />
         </button>
       </div>
       <div className={styles.mainNav}>

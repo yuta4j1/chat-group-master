@@ -1,13 +1,11 @@
 {
-  "name": "client",
+  "name": "api-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "start": "node dist/app.js",
+    "build": "node esbuild.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,16 +19,7 @@
   },
   "homepage": "https://github.com/yuta4j1/chat-group-master#readme",
   "dependencies": {
-    "next": "^12.0.7",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-icons": "^4.3.1",
-    "socket.io-client": "^4.4.1"
-  },
-  "devDependencies": {
-    "@types/react": "^17.0.38",
-    "@types/react-dom": "^17.0.11",
-    "eslint": "^8.6.0",
-    "eslint-config-next": "^12.0.7"
+    "@prisma/client": "^3.7.0",
+    "fastify": "^3.25.3"
   }
 }

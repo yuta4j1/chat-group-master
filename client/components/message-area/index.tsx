@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react'
-import Input from './Input'
+import Input from './input'
 import styles from './MessageArea.module.css'
-import MessageItemList from './MessageItemList'
+import MessageItemList from './message-item-list'
 import { ChatRoom, ChatMessage } from '../../interfaces'
 import { useIsomorphicEffect } from '../../hooks/use-isomorphic-effect'
 import { io } from 'socket.io-client'
