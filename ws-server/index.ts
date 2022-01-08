@@ -20,8 +20,6 @@ const roomsNamespace = io.of("rooms")
 
 const PORT = 8081
 roomsNamespace.on('connection', socket => {
-  console.log(`Websocket Server Started on ${PORT}`)
-  console.log("handshake query", socket.handshake.query)
   socket.on("join", (roomId) => {
     console.log(`Joined at ${roomId}`)
     socket.join(roomId)
@@ -29,7 +27,7 @@ roomsNamespace.on('connection', socket => {
   socket.on('message', data => {
     console.log('message data:', data)
     const msg = data as ChatMessage
-    roomsNamespace.to("room1").emit("get_message", JSON.stringify(msg))
+    roomsNamespace.to(msg.roomId).emit("get_message", JSON.stringify(msg))
   })
 })
 

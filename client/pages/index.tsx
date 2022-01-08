@@ -18,6 +18,9 @@ const Home: NextPage = () => {
         <div>
           <Link href="/chat">チャット画面へ</Link>
         </div>
+        <div>
+          <Link href="/rooms">部屋画面へ</Link>
+        </div>
       </main>
 
       <footer className={styles.footer}>
