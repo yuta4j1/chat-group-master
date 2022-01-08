@@ -1,0 +1,43 @@
+.searchTextArea {
+    display: flex;
+    align-items: center;
+    background-color: #3D393F;
+    padding: 4px 0px 4px 16px;
+    color: white;
+    height: 2rem;
+    border-radius: 8px;
+    margin: 8px 0;
+    width: 14rem;
+}
+
+.inputText {
+    margin-left: 2px;
+    font-size: 0.8rem;
+}
+
+.contentWrapper {
+    height: 100%;
+    width: 402px;
+    padding: 0 0 0 2rem;
+    background-color: #120F14;
+}
+
+.roomListArea {
+    padding: 1rem 0 1rem 0;
+}
+
+.roomListArea > ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: left;
+    color: white;
+}
+
+.roomListArea > ul > li {
+    padding: 8px 0;
+}
+
+.roomListArea > ul > li:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}

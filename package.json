@@ -1,0 +1,29 @@
+{
+  "name": "chat-group-master-workspace",
+  "version": "1.0.0",
+  "description": "<h1 align=\"center\">Chat Group Master</h1>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuta4j1/chat-group-master.git"
+  },
+  "author": "yuta4j1",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuta4j1/chat-group-master/issues"
+  },
+  "homepage": "https://github.com/yuta4j1/chat-group-master#readme",
+  "devDependencies": {
+    "@types/node": "^17.0.8",
+    "esbuild": "^0.14.10",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4"
+  },
+  "workspaces": [
+    "client",
+    "ms-server"
+  ]
+}
