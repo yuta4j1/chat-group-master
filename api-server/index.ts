@@ -1,4 +1,5 @@
 import Fastify from 'fastify'
+import cors from 'fastify-cors'
 import { PrismaClient } from '@prisma/client'
 import path from 'path'
 
@@ -13,6 +14,8 @@ const prisma = new PrismaClient({
 const fastify = Fastify({
   logger: true,
 })
+
+fastify.register(cors)
 
 fastify.get('/channels', async (request, reply) => {
   const channelList = await prisma.channel.findMany()

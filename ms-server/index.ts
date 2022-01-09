@@ -28,6 +28,14 @@ roomsNamespace.on('connection', (socket) => {
     const msg = data as ChatMessage
     roomsNamespace.to(msg.roomId).emit('get_message', JSON.stringify(msg))
   })
+
+  socket.on('disconnecting', () => {
+    console.log(socket.rooms) // the Set contains at least the socket ID
+  })
+
+  socket.on('disconnect', () => {
+    console.log('接続が切られました')
+  })
 })
 
 httpServer.listen(PORT)

@@ -31,5 +31,8 @@
     "client",
     "ms-server",
     "api-server"
-  ]
+  ],
+  "dependencies": {
+    "@prisma/client": "^3.7.0"
+  }
 }

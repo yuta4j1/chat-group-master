@@ -20,6 +20,7 @@
   "homepage": "https://github.com/yuta4j1/chat-group-master#readme",
   "dependencies": {
     "@prisma/client": "^3.7.0",
-    "fastify": "^3.25.3"
+    "fastify": "^3.25.3",
+    "fastify-cors": "^6.0.2"
   }
 }

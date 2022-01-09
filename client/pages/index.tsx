@@ -1,79 +1,52 @@
 import { NextPage } from 'next'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ChatMessage, ChatRoom } from '../interfaces'
+import { Channel, ChannelListResponse } from '../interfaces'
+import { useCustomFetch } from '../hooks/use-custom-fetch'
 import Header from '../components/header'
 import SideBar from '../components/side-bar'
 import MessageArea from '../components/message-area'
 import styles from '../styles/Index.module.css'
 
-const roomList: ChatRoom[] = [
-  {
-    roomId: 'ascklcl',
-    roomName: 'FRONTEND DEVELOPERS',
-    imagePic: '',
-  },
-  {
-    roomId: 'fhdask',
-    roomName: 'RAMDOM',
-    imagePic: '',
-  },
-  {
-    roomId: 'cjdkfg',
-    roomName: 'BACKEND',
-    imagePic: '',
-  },
-  {
-    roomId: '189fdsa',
-    roomName: 'CATS AND DOGS',
-    imagePic: '',
-  },
-  {
-    roomId: 'oafidsof',
-    roomName: 'WELCOME',
-    imagePic: '',
-  },
-]
-
-const fetchRooms = () => {
-  return roomList
-}
-
 const IndexPage: NextPage = () => {
-  const [rooms, setRooms] = useState<ChatRoom[]>([])
-  const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null)
+  const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null)
+  const {
+    data: channels,
+    isError,
+    isLoading,
+  } = useCustomFetch<ChannelListResponse>('/channels')
 
   useEffect(() => {
-    setRooms(fetchRooms())
-  }, [])
-
-  useEffect(() => {
-    if (rooms && rooms.length > 0) {
-      setSelectedRoom(rooms[0])
+    const chs = channels?.channelList
+    if (chs && chs.length > 0) {
+      setSelectedChannel(chs[0])
     }
-  }, [rooms])
+  }, [channels])
 
   return (
     <div className={styles.containerWrapper}>
-      <Header roomName={selectedRoom ? selectedRoom.roomName : ''} />
+      <Header roomName={selectedChannel ? selectedChannel.name : ''} />
       <div
         className={styles.bodyWrapper}
         style={{
           height: 'calc(100% - 64px)',
         }}
       >
-        <SideBar
-          rooms={rooms}
-          cbSelectRoom={(roomId: string) => {
-            const r = rooms.find((v) => v.roomId === roomId)
-            if (r) {
-              setSelectedRoom(r)
-            } else {
-              setSelectedRoom(null)
-            }
-          }}
-        />
-        {selectedRoom && <MessageArea room={selectedRoom} />}
+        {isLoading && <p>Loading...</p>}
+        {isError && <p>チャンネル情報の取得に失敗しました。</p>}
+        {channels && (
+          <SideBar
+            channels={channels.channelList}
+            cbSelectRoom={(roomId: string) => {
+              const r = channels.channelList.find((v) => v.id === roomId)
+              if (r) {
+                setSelectedChannel(r)
+              } else {
+                setSelectedChannel(null)
+              }
+            }}
+          />
+        )}
+        {selectedChannel && <MessageArea channel={selectedChannel} />}
       </div>
     </div>
   )

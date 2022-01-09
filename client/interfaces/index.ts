@@ -15,3 +15,13 @@ export interface MessageItemProps {
   userName: string
   userPhotoUrl: string
 }
+
+export type Channel = {
+  id: string
+  name: string
+  description: string
+}
+
+export type ChannelListResponse = {
+  channelList: Channel[]
+}

@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import styles from './SideBar.module.css'
 import { AiOutlineSearch } from 'react-icons/ai'
-import { ChatRoom } from '../../interfaces'
+import { Channel } from '../../interfaces'
 
 const SideBar: React.VFC<{
-  rooms: ChatRoom[]
+  channels: Channel[]
   cbSelectRoom: (roomId: string) => void
-}> = ({ rooms, cbSelectRoom }) => {
+}> = ({ channels, cbSelectRoom }) => {
   const [filterText, setFilterText] = useState('')
   return (
     <div className={styles.contentWrapper}>
@@ -22,14 +22,14 @@ const SideBar: React.VFC<{
       </div>
       <div className={styles.roomListArea}>
         <ul>
-          {rooms.map((v, i) => (
+          {channels.map((v, i) => (
             <li
               key={i}
               onClick={() => {
-                cbSelectRoom(v.roomId)
+                cbSelectRoom(v.id)
               }}
             >
-              {v.roomName}
+              {v.name}
             </li>
           ))}
         </ul>
