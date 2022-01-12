@@ -1,9 +1,9 @@
 import React from 'react'
 import MessageItem from '../message-item'
 import styles from './MessageItemList.module.css'
-import { ChatMessage, MessageItemProps } from '../../../interfaces'
+import { MessageItemProps } from '../../../interfaces'
 
-const MessageItemList: React.VFC<{ messages: ChatMessage[] }> = ({
+const MessageItemList: React.VFC<{ messages: MessageItemProps[] | null }> = ({
   messages,
 }) => {
   return (
@@ -14,17 +14,8 @@ const MessageItemList: React.VFC<{ messages: ChatMessage[] }> = ({
         overflow: 'scroll',
       }}
     >
-      {messages.map((v, i) => (
-        <MessageItem
-          key={i}
-          data={
-            {
-              msg: v.message,
-              userName: v.userName,
-              userPhotoUrl: 'test',
-            } as MessageItemProps
-          }
-        />
+      {messages?.map((v, i) => (
+        <MessageItem key={i} data={v} />
       ))}
     </div>
   )

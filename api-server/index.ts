@@ -22,6 +22,18 @@ fastify.get('/channels', async (request, reply) => {
   return { channelList: channelList }
 })
 
+fastify.get('/channels/:channel_id/members', async (request, reply) => {
+  const chMembers = await prisma.channelMember.findMany({
+    where: {
+      channelId: (request.params as { channel_id: string }).channel_id,
+    },
+    include: {
+      User: true,
+    },
+  })
+  return { members: chMembers.map((v) => v.User) }
+})
+
 fastify.get('/account/:id', async (request, reply) => {
   console.log('req', request)
   const user = await prisma.user.findUnique({

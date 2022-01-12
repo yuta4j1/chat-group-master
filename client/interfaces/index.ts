@@ -1,7 +1,7 @@
-export interface ChatMessage {
-  message: string
+export interface ChannelMessage {
+  text: string
   roomId: string
-  userName: string
+  userId: string
 }
 
 export interface ChatRoom {
@@ -11,9 +11,18 @@ export interface ChatRoom {
 }
 
 export interface MessageItemProps {
-  msg: string
+  text: string
+  userId: string
   userName: string
-  userPhotoUrl: string
+  createdAt: string
+  avatarUrl: string
+}
+
+export type User = {
+  id: string
+  email: string
+  name: string
+  avatarUrl: string
 }
 
 export type Channel = {

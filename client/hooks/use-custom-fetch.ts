@@ -9,3 +9,13 @@ export const useCustomFetch = <T>(key: string) => {
     isLoading: !data && !error,
   }
 }
+
+// 条件付きフェッチ
+export const useConditionalFetch = <T>(key: string, fnCond: () => boolean) => {
+  const { data, error } = useSWR<T>(fnCond() ? key : null, getRequest)
+  return {
+    data,
+    isError: !!error,
+    isLoading: !data && !error,
+  }
+}
