@@ -10,7 +10,6 @@ body {
 }
 
 div#__next,
-div#__next > div,
 div#__next > div > main {
   height: 100%;
 }
@@ -24,7 +23,7 @@ button{
   appearance: none;
 }
 
-input {
+input, textarea {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;

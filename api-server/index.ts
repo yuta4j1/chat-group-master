@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import cors from 'fastify-cors'
 import { PrismaClient } from '@prisma/client'
 import path from 'path'
+import { channelIdGen } from './random'
 
 const prisma = new PrismaClient({
   datasources: {
@@ -22,6 +23,24 @@ fastify.get('/channels', async (request, reply) => {
   return { channelList: channelList }
 })
 
+fastify.post('/channels', async (request, reply) => {
+  const reqBody = request.body as { name: string; description: string }
+  const newChId = channelIdGen()
+  try {
+    await prisma.channel.create({
+      data: {
+        id: newChId,
+        name: reqBody.name,
+        description: reqBody.description,
+      },
+    })
+    return { result: 'success' }
+  } catch (err) {
+    console.error(err)
+    return { result: 'error' }
+  }
+})
+
 fastify.get('/channels/:channel_id/members', async (request, reply) => {
   const chMembers = await prisma.channelMember.findMany({
     where: {
@@ -35,7 +54,6 @@ fastify.get('/channels/:channel_id/members', async (request, reply) => {
 })
 
 fastify.get('/account/:id', async (request, reply) => {
-  console.log('req', request)
   const user = await prisma.user.findUnique({
     where: {
       id: 'uiodsa',

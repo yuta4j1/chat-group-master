@@ -8,8 +8,9 @@ import { Channel, User } from '../../interfaces'
 const SideBar: React.VFC<{
   channels: Channel[]
   cbSelectRoom: (roomId: string) => void
+  addChannelClickHandler: () => void
   channelMemberMap: { [key: string]: User[] }
-}> = ({ channels, cbSelectRoom, channelMemberMap }) => {
+}> = ({ channels, cbSelectRoom, channelMemberMap, addChannelClickHandler }) => {
   const [filterText, setFilterText] = useState('')
   const [detailedChannel, setDetailedChannel] = useState<Channel | null>(null)
 
@@ -36,7 +37,10 @@ const SideBar: React.VFC<{
       ) : (
         <div className={styles.sideNavChannelAdd}>
           <div>Channels</div>
-          <button className={styles.channelAddButton}>
+          <button
+            className={styles.channelAddButton}
+            onClick={addChannelClickHandler}
+          >
             <BsPlus size={21} />
           </button>
         </div>

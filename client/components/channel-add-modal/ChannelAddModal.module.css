@@ -1,0 +1,65 @@
+.backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    background-color: black;
+    opacity: 0.4;
+}
+
+.modalTitle {
+    padding-left: 32px;
+    padding-top: 8px;
+    font-size: 1.2rem;
+    
+}
+
+.container {
+    position: absolute;
+    top: 30%;
+    background-color: #120F14;
+    color: white;
+    width: 600px;
+    height: 390px;
+    border-radius: 12px;
+    z-index: 2;
+}
+
+.formContainer {
+    padding: 4px 32px;
+}
+
+.formText {
+    background-color: #3D393F;
+    padding: 8px 8px;
+    border-radius: 6px;
+    margin-top: 1rem;
+}
+
+.formInputText {
+    width: 100%;
+    color: white;
+}
+
+.formTextArea {
+    background-color: #3D393F;
+    padding: 8px 8px;
+    border-radius: 6px;
+    margin-top: 1rem;
+}
+
+.buttonArea {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 32px;
+}
+
+.saveButton {
+    background-color: #2F80ED;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 24px;
+    cursor: pointer;
+}

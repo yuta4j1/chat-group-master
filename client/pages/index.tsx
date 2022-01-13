@@ -1,14 +1,16 @@
 import { NextPage } from 'next'
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useSWRConfig } from 'swr'
 import { Channel, ChannelListResponse, User } from '../interfaces'
 import { useCustomFetch } from '../hooks/use-custom-fetch'
 import { getRequest } from '../fetcher'
 import SideBar from '../components/side-bar'
 import MessageArea from '../components/message-area'
+import ChannelAddModal from '../components/channel-add-modal'
 import styles from '../styles/Index.module.css'
 
 const IndexPage: NextPage = () => {
+  const [isDispModal, setIsDispModal] = useState(false)
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null)
   const [channelMemberMap, setChannelMemberMap] = useState<{
     [key: string]: User[]
@@ -58,27 +60,33 @@ const IndexPage: NextPage = () => {
   }, [selectedChannel, channelMemberMap])
 
   return (
-    <div className={styles.containerWrapper}>
-      <div className={styles.bodyWrapper}>
-        {isLoading && <p>Loading...</p>}
-        {isError && <p>チャンネル情報の取得に失敗しました。</p>}
-        {channels && (
-          <SideBar
-            channelMemberMap={channelMemberMap}
-            channels={channels.channelList}
-            cbSelectRoom={async (roomId: string) => {
-              const r = channels.channelList.find((v) => v.id === roomId)
-              if (r) {
-                setSelectedChannel(r)
-              } else {
-                setSelectedChannel(null)
-              }
-            }}
-          />
-        )}
-        <MessageArea channel={selectedChannel} member={channelMember} />
+    <>
+      <div className={styles.containerWrapper}>
+        <div className={styles.bodyWrapper}>
+          {isLoading && <p>Loading...</p>}
+          {isError && <p>チャンネル情報の取得に失敗しました。</p>}
+          {channels && (
+            <SideBar
+              channelMemberMap={channelMemberMap}
+              channels={channels.channelList}
+              cbSelectRoom={async (roomId: string) => {
+                const r = channels.channelList.find((v) => v.id === roomId)
+                if (r) {
+                  setSelectedChannel(r)
+                } else {
+                  setSelectedChannel(null)
+                }
+              }}
+              addChannelClickHandler={() => setIsDispModal(true)}
+            />
+          )}
+          <MessageArea channel={selectedChannel} member={channelMember} />
+        </div>
       </div>
-    </div>
+      {isDispModal && (
+        <ChannelAddModal closeModal={() => setIsDispModal(false)} />
+      )}
+    </>
   )
 }
 
