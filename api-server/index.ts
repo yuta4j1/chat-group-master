@@ -62,6 +62,20 @@ fastify.get('/account/:id', async (request, reply) => {
   return { user: user }
 })
 
+fastify.get('/channels/:channel_id/conversations', async (request, reply) => {
+  const chId = (request.params as { channel_id: string }).channel_id
+  const msgs = await prisma.message.findMany({
+    where: {
+      roomId: chId,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 20,
+  })
+  return { messages: msgs, cursor: '' }
+})
+
 const start = async () => {
   try {
     await fastify.listen(1234)

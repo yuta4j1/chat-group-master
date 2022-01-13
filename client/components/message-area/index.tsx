@@ -2,8 +2,14 @@ import React, { useState, useEffect } from 'react'
 import Input from './input'
 import styles from './MessageArea.module.css'
 import MessageItemList from './message-item-list'
-import { Channel, ChannelMessage, User } from '../../interfaces'
+import {
+  Channel,
+  ChannelMessage,
+  User,
+  ChannelMessageResponse,
+} from '../../interfaces'
 import { useIsomorphicEffect } from '../../hooks/use-isomorphic-effect'
+import { useConditionalFetch } from '../../hooks/use-custom-fetch'
 import { io, Socket } from 'socket.io-client'
 
 let socket: Socket | null = null
@@ -12,6 +18,10 @@ const MessageArea: React.VFC<{
   channel: Channel | null
   member: User[] | null
 }> = ({ channel, member }) => {
+  const { data: msgRes } = useConditionalFetch<ChannelMessageResponse>(
+    `/channels/${channel?.id}/conversations`,
+    () => !!channel
+  )
   const [messageList, setMessageList] = useState<ChannelMessage[]>([])
 
   useIsomorphicEffect(() => {
@@ -19,6 +29,7 @@ const MessageArea: React.VFC<{
     // チャンネルが切り替わる毎に、WebSocketの接続を行う。
     socket = io('ws://localhost:8081/rooms')
     socket.on('connect', () => {
+      if (!socket) return
       console.log('[Connected] socketID:', socket.id)
       socket.emit('join', channel.id)
     })
@@ -29,7 +40,7 @@ const MessageArea: React.VFC<{
 
     return () => {
       // チャンネルが切り替わる際、コネクションを破棄する
-      socket.disconnect()
+      socket?.disconnect()
     }
   }, [channel])
 
@@ -45,8 +56,8 @@ const MessageArea: React.VFC<{
     })
 
     return () => {
-      socket.off('get_message')
-      socket.off('init_messages')
+      socket?.off('get_message')
+      socket?.off('init_messages')
     }
   }, [messageList, socket, channel])
 
@@ -57,14 +68,15 @@ const MessageArea: React.VFC<{
       </div>
       <MessageItemList
         messages={
-          member
-            ? messageList.map((v) => {
+          member && msgRes?.messages
+            ? msgRes.messages.map((v) => {
                 const u = member.find((vv) => vv.id === v.userId)
                 return {
                   userId: v.userId,
                   text: v.text,
                   userName: u?.name ?? 'UNKNOWN',
                   avatarUrl: u?.avatarUrl ?? '',
+                  createdAt: v.createdAt,
                 }
               })
             : null
@@ -73,13 +85,14 @@ const MessageArea: React.VFC<{
       <div>
         <Input
           sendMessage={(msgText: string) => {
-            // TODO: userIdを渡す
-            const msg: ChatMessage = {
+            if (!channel) return
+            // TODO: ログインユーザのuserIdを渡す
+            const msg: { text: string; roomId: string; userId: string } = {
               text: msgText,
               roomId: channel.id,
               userId: 'uiodsa',
             }
-            socket.emit('message', msg)
+            socket?.emit('message', msg)
           }}
         />
       </div>

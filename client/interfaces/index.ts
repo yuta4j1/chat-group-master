@@ -2,6 +2,19 @@ export interface ChannelMessage {
   text: string
   roomId: string
   userId: string
+  createdAt: string
+}
+
+export interface ChannelMessageResponse {
+  messages: {
+    id: string
+    text: string
+    userId: string
+    roomId: string
+    cursor: string
+    createdAt: string
+  }[]
+  cursor: string
 }
 
 export interface ChatRoom {

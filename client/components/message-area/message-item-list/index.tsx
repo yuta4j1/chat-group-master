@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import MessageItem from '../message-item'
 import styles from './MessageItemList.module.css'
 import { MessageItemProps } from '../../../interfaces'
@@ -6,6 +6,10 @@ import { MessageItemProps } from '../../../interfaces'
 const MessageItemList: React.VFC<{ messages: MessageItemProps[] | null }> = ({
   messages,
 }) => {
+  const msgs = useMemo(() => {
+    if (!messages) return []
+    return [...messages.reverse()]
+  }, [messages])
   return (
     <div
       className={styles.container}
@@ -14,7 +18,7 @@ const MessageItemList: React.VFC<{ messages: MessageItemProps[] | null }> = ({
         overflow: 'scroll',
       }}
     >
-      {messages?.map((v, i) => (
+      {msgs.reverse().map((v, i) => (
         <MessageItem key={i} data={v} />
       ))}
     </div>

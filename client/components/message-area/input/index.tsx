@@ -22,6 +22,7 @@ const Input: React.VFC<{ sendMessage: (msgText: string) => void }> = ({
             sendMessage(text)
             setText('')
           }}
+          disabled={!text}
         >
           <AiOutlineSend size={20} />
         </button>
