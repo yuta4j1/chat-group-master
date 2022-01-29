@@ -18,7 +18,6 @@ const getKeyCb =
       return url
     } else {
       if (!previousPageData) return null
-      console.log('previousPageData', previousPageData)
       if (previousPageData.cursor === '') {
         // 最終pageまで到達した場合、リクエストを投げない
         return null
@@ -30,12 +29,13 @@ const getKeyCb =
 
 export const useChannelConversationsHisotryFetch = <T>(chId?: string) => {
   const urlPath = chId ? `/channels/${chId}/conversations` : ''
-  const { data, error, size, setSize } = useSWRInfinite<T>(
+  const { data, error, size, setSize, mutate } = useSWRInfinite<T>(
     getKeyCb(urlPath),
     getRequest
   )
   return {
     data,
+    keyedMutate: mutate,
     isError: !!error,
     isLoading: !data && !error,
     nextFetch: () => setSize(size + 1),

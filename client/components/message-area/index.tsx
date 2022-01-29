@@ -23,6 +23,7 @@ const MessageArea: React.VFC<{
 }> = ({ channel, member }) => {
   const {
     data: msgRes,
+    keyedMutate,
     isError,
     isLoading,
     nextFetch,
@@ -57,7 +58,6 @@ const MessageArea: React.VFC<{
     if (!socket || !channel) return
     socket.on('receive_message', (msg) => {
       const _msg = JSON.parse(msg)
-      console.log('msgRes', msgRes)
 
       if (msgRes && msgRes.length > 0) {
         const _tmp = [...msgRes]
@@ -66,7 +66,6 @@ const MessageArea: React.VFC<{
         mutate(
           `/channels/${channel.id}/conversations`,
           (data: ChannelMessageResponse) => {
-            console.log('ueeeee', data)
             const _tmp = [_msg, ...data.messages]
             return {
               ...data,
@@ -75,6 +74,7 @@ const MessageArea: React.VFC<{
           },
           false
         )
+        keyedMutate(msgRes)
       }
     })
 
