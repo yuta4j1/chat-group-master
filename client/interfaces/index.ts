@@ -5,6 +5,14 @@ export interface ChannelMessage {
   createdAt: string
 }
 
+export interface SendMessage {
+  text: string
+  roomId: string
+  userId: string
+  createdAt: Date
+  cursor: string
+}
+
 export interface ChannelMessageResponse {
   messages: {
     id: string

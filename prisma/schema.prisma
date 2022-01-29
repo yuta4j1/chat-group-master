@@ -24,7 +24,7 @@ model Message {
   text      String
   userId    String
   roomId    String
-  cursor    String
+  cursor    String   @unique
 }
 
 model Channel {

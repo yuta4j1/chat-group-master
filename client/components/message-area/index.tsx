@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Input from './input'
 import styles from './MessageArea.module.css'
 import MessageItemList from './message-item-list'
 import {
   Channel,
-  ChannelMessage,
+  SendMessage,
   User,
   ChannelMessageResponse,
 } from '../../interfaces'
+import { cursorIdGen } from '../../lib/random'
 import { useIsomorphicEffect } from '../../hooks/use-isomorphic-effect'
-import { useConditionalFetch } from '../../hooks/use-custom-fetch'
+import { useChannelConversationsHisotryFetch } from '../../hooks/use-custom-fetch'
+import { postRequest } from '../../fetcher'
 import { io, Socket } from 'socket.io-client'
+import { useSWRConfig } from 'swr'
 
 let socket: Socket | null = null
 
@@ -18,11 +21,17 @@ const MessageArea: React.VFC<{
   channel: Channel | null
   member: User[] | null
 }> = ({ channel, member }) => {
-  const { data: msgRes } = useConditionalFetch<ChannelMessageResponse>(
-    `/channels/${channel?.id}/conversations`,
-    () => !!channel
-  )
-  const [messageList, setMessageList] = useState<ChannelMessage[]>([])
+  const {
+    data: msgRes,
+    isError,
+    isLoading,
+    nextFetch,
+  } = useChannelConversationsHisotryFetch<ChannelMessageResponse>(channel?.id)
+  // const [messageList, setMessageList] = useState<ChannelMessage[]>([])
+
+  const { cache, mutate } = useSWRConfig()
+
+  console.log({ cache })
 
   useIsomorphicEffect(() => {
     if (!channel) return
@@ -45,21 +54,40 @@ const MessageArea: React.VFC<{
   }, [channel])
 
   useEffect(() => {
-    if (!socket) return
-    socket.on('get_message', (msg) => {
+    if (!socket || !channel) return
+    socket.on('receive_message', (msg) => {
       const _msg = JSON.parse(msg)
-      setMessageList([...messageList, _msg])
-    })
+      console.log('msgRes', msgRes)
 
-    socket.on('init_messages', (msgs) => {
-      setMessageList(msgs)
+      if (msgRes && msgRes.length > 0) {
+        const _tmp = [...msgRes]
+        _tmp[0].messages = [_msg, ..._tmp[0].messages]
+        // ローカルキャッシュを更新する
+        mutate(
+          `/channels/${channel.id}/conversations`,
+          (data: ChannelMessageResponse) => {
+            console.log('ueeeee', data)
+            const _tmp = [_msg, ...data.messages]
+            return {
+              ...data,
+              messages: _tmp,
+            }
+          },
+          false
+        )
+      }
     })
 
     return () => {
-      socket?.off('get_message')
-      socket?.off('init_messages')
+      socket?.off('receive_message')
     }
-  }, [messageList, socket, channel])
+  }, [socket, channel, msgRes])
+
+  const messages = useMemo(() => {
+    return msgRes?.flatMap((v) => v.messages)
+  }, [msgRes])
+
+  console.log('-- messages', messages)
 
   return (
     <div className={styles.container}>
@@ -68,8 +96,8 @@ const MessageArea: React.VFC<{
       </div>
       <MessageItemList
         messages={
-          member && msgRes?.messages
-            ? msgRes.messages.map((v) => {
+          member && messages
+            ? messages.map((v) => {
                 const u = member.find((vv) => vv.id === v.userId)
                 return {
                   userId: v.userId,
@@ -81,18 +109,31 @@ const MessageArea: React.VFC<{
               })
             : null
         }
+        nextHistoryFetch={nextFetch}
       />
       <div>
         <Input
-          sendMessage={(msgText: string) => {
+          sendMessage={async (msgText: string) => {
             if (!channel) return
             // TODO: ログインユーザのuserIdを渡す
-            const msg: { text: string; roomId: string; userId: string } = {
+            const msg: SendMessage = {
               text: msgText,
               roomId: channel.id,
               userId: 'uiodsa',
+              createdAt: new Date(),
+              cursor: cursorIdGen(),
             }
-            socket?.emit('message', msg)
+            try {
+              const res = await postRequest<SendMessage, any>(
+                `/channels/${channel.id}/conversations`,
+                msg
+              )
+              if (res) {
+                socket?.emit('broadcast_message', res.result)
+              }
+            } catch (err) {
+              console.error(err)
+            }
           }}
         />
       </div>

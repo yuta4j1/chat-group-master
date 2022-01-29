@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
 import cors from 'fastify-cors'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import path from 'path'
 import { channelIdGen } from './random'
 
@@ -18,11 +18,13 @@ const fastify = Fastify({
 
 fastify.register(cors)
 
+// チャンネル情報の取得
 fastify.get('/channels', async (request, reply) => {
   const channelList = await prisma.channel.findMany()
   return { channelList: channelList }
 })
 
+// チャンネルの追加登録
 fastify.post('/channels', async (request, reply) => {
   const reqBody = request.body as { name: string; description: string }
   const newChId = channelIdGen()
@@ -41,6 +43,7 @@ fastify.post('/channels', async (request, reply) => {
   }
 })
 
+// チャンネル所属のメンバー取得
 fastify.get('/channels/:channel_id/members', async (request, reply) => {
   const chMembers = await prisma.channelMember.findMany({
     where: {
@@ -62,18 +65,68 @@ fastify.get('/account/:id', async (request, reply) => {
   return { user: user }
 })
 
+const PER_PAGE_NUM = 20
+
+// メッセージ履歴の取得
 fastify.get('/channels/:channel_id/conversations', async (request, reply) => {
+  let cursorId = null
+  const qParam = JSON.parse(JSON.stringify(request.query))
+  if (qParam) {
+    cursorId = (qParam as { cursor: string }).cursor
+  }
   const chId = (request.params as { channel_id: string }).channel_id
-  const msgs = await prisma.message.findMany({
+  let conds: Prisma.MessageFindManyArgs = {
     where: {
       roomId: chId,
     },
     orderBy: {
       createdAt: 'desc',
     },
-    take: 20,
-  })
-  return { messages: msgs, cursor: '' }
+    take: PER_PAGE_NUM,
+  }
+  if (cursorId) {
+    conds = {
+      ...conds,
+      cursor: {
+        cursor: cursorId,
+      },
+      skip: 1,
+    }
+  }
+
+  console.log('*** conds', conds)
+
+  const msgs = await prisma.message.findMany(conds)
+  let res = null
+  if (msgs.length < PER_PAGE_NUM) {
+    // 最終ページの場合、cursorは空文字で返す
+    res = { messages: msgs, cursor: '' }
+  } else {
+    res = { messages: msgs, cursor: msgs[msgs.length - 1].cursor }
+  }
+  return res
+})
+
+interface SendMessage {
+  text: string
+  roomId: string
+  userId: string
+  createdAt: Date
+  cursor: string
+}
+
+// メッセージの送信
+fastify.post('/channels/:channel_id/conversations', async (request, reply) => {
+  const reqBody = request.body as SendMessage
+  try {
+    const res = await prisma.message.create({
+      data: reqBody,
+    })
+    return { result: res }
+  } catch (err) {
+    console.error(err)
+    return { err }
+  }
 })
 
 const start = async () => {
