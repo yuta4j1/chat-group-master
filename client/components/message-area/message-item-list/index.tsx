@@ -20,20 +20,6 @@ const MessageItemList: React.VFC<{
     return [...messages.reverse()]
   }, [messages])
 
-  // useEffect(() => {
-  //   const currScrollH = el.current?.scrollHeight
-  //   if (currScrollH) {
-  //     if (prevScrollCapture.current) {
-  //       const scrollHeight = prevScrollCapture.current.scrollHeight
-  //       const scrollTop = prevScrollCapture.current.scrollTop
-  //       el.current.scrollTo(0, currScrollH - scrollHeight + scrollTop)
-  //     } else {
-  //       el.current.scrollTo(0, currScrollH)
-  //     }
-  //   }
-
-  // }, [messages])
-
   const scrollToBottom = () => {
     const currScrollH = el.current?.scrollHeight
     if (currScrollH) {
