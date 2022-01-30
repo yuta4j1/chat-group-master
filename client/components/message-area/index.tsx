@@ -28,7 +28,6 @@ const MessageArea: React.VFC<{
     isLoading,
     nextFetch,
   } = useChannelConversationsHisotryFetch<ChannelMessageResponse>(channel?.id)
-  // const [messageList, setMessageList] = useState<ChannelMessage[]>([])
 
   const { cache, mutate } = useSWRConfig()
 
@@ -83,11 +82,17 @@ const MessageArea: React.VFC<{
     }
   }, [socket, channel, msgRes])
 
+  const isCursorEnd = useMemo(() => {
+    if (msgRes && msgRes.length > 0) {
+      return msgRes[msgRes.length - 1].cursor === ''
+    } else {
+      return false
+    }
+  }, [msgRes])
+
   const messages = useMemo(() => {
     return msgRes?.flatMap((v) => v.messages)
   }, [msgRes])
-
-  console.log('-- messages', messages)
 
   return (
     <div className={styles.container}>
@@ -109,6 +114,7 @@ const MessageArea: React.VFC<{
               })
             : null
         }
+        isCursorEnd={isCursorEnd}
         nextHistoryFetch={nextFetch}
       />
       <div>

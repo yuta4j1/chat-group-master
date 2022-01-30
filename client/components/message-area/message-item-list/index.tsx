@@ -3,12 +3,12 @@ import MessageItem from '../message-item'
 import styles from './MessageItemList.module.css'
 import { MessageItemProps } from '../../../interfaces'
 
-let isFetchingHistoryData = false
-
 const MessageItemList: React.VFC<{
   messages: MessageItemProps[] | null
+  isCursorEnd: boolean
   nextHistoryFetch: () => Promise<any>
-}> = ({ messages, nextHistoryFetch }) => {
+}> = ({ messages, isCursorEnd, nextHistoryFetch }) => {
+  const isFetchingHistoryData = useRef(false)
   const el = useRef<HTMLDivElement>(null)
   const prevScrollCapture = useRef<{
     scrollHeight: number
@@ -20,7 +20,30 @@ const MessageItemList: React.VFC<{
     return [...messages.reverse()]
   }, [messages])
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const currScrollH = el.current?.scrollHeight
+  //   if (currScrollH) {
+  //     if (prevScrollCapture.current) {
+  //       const scrollHeight = prevScrollCapture.current.scrollHeight
+  //       const scrollTop = prevScrollCapture.current.scrollTop
+  //       el.current.scrollTo(0, currScrollH - scrollHeight + scrollTop)
+  //     } else {
+  //       el.current.scrollTo(0, currScrollH)
+  //     }
+  //   }
+
+  // }, [messages])
+
+  const scrollToBottom = () => {
+    const currScrollH = el.current?.scrollHeight
+    if (currScrollH) {
+      el.current.scrollTo(0, currScrollH)
+    }
+  }
+
+  // チャット画面に見えている位置が、メッセージが追加された前後で変化しないよう
+  // スクロールをコントロールするヘルパ関数
+  const unflinchingScroll = () => {
     const currScrollH = el.current?.scrollHeight
     if (currScrollH) {
       if (prevScrollCapture.current) {
@@ -31,9 +54,24 @@ const MessageItemList: React.VFC<{
         el.current.scrollTo(0, currScrollH)
       }
     }
+  }
 
-    return () => {}
+  useEffect(() => {
+    if (isFetchingHistoryData.current) {
+      unflinchingScroll()
+      isFetchingHistoryData.current = false
+    } else {
+      // メッセージ追加時、画面下部までスクロールする
+      scrollToBottom()
+    }
   }, [messages])
+
+  useEffect(() => {
+    return () => {
+      // コンポーネントがアンマウントされる際、prevScrollCapture の値をクリーンアップする
+      prevScrollCapture.current = null
+    }
+  }, [])
 
   return (
     <>
@@ -45,7 +83,7 @@ const MessageItemList: React.VFC<{
         }}
         ref={el}
         onScroll={(e) => {
-          if (isFetchingHistoryData) {
+          if (isFetchingHistoryData.current || isCursorEnd) {
             return
           }
           const fromTop = el.current?.scrollTop
@@ -56,11 +94,13 @@ const MessageItemList: React.VFC<{
               scrollHeight: el.current?.scrollHeight,
               scrollTop: el.current?.scrollTop,
             }
-            isFetchingHistoryData = true
+            isFetchingHistoryData.current = true
             // 次のメッセージを取得する
             nextHistoryFetch().then(() => {
               // データ取得に成功した場合、フラグをoffにする
-              isFetchingHistoryData = false
+              // チャット画面に見えている位置が、メッセージが追加された前後で変化しないよう
+              // スクロールをコントロールする
+              unflinchingScroll()
             })
           }
         }}

@@ -94,8 +94,6 @@ fastify.get('/channels/:channel_id/conversations', async (request, reply) => {
     }
   }
 
-  console.log('*** conds', conds)
-
   const msgs = await prisma.message.findMany(conds)
   let res = null
   if (msgs.length < PER_PAGE_NUM) {
